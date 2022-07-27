@@ -47,6 +47,8 @@
         pseudo = prompt("Choisissez un pseudo");
       }
 
+      document.title = `${roomId.split('/')[1]} - ${pseudo}`;
+
       
       let socket = io();
 
