@@ -5,7 +5,7 @@
 Une fois le dépot cloné, allez dans le dossier, et exécutez les commandes suivantes:
 
 ```
-git clone
+npm install
 node server.js
 ```
 
