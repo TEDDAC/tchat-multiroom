@@ -16,7 +16,13 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
+    <div style="display: flex; flex-direction: row;">
+      <ul id="messages" style="width: 80%;"></ul>
+      <div style="width: 20%;">
+        <p id="name" style="float: right; border: black 1px solid; padding: 10px;"></p>
+        <ul id="users"></ul>
+      </div>
+    </div>
     <form id="form" action="">
       <input id="input" autocomplete="off" /><button>Send</button>
     </form>
@@ -26,6 +32,8 @@
       let messages = document.getElementById('messages');
       let form = document.getElementById('form');
       let input = document.getElementById('input');
+      let userList = document.getElementById('users');
+      let users = [];
       
       let roomId = window.location.pathname
       while(roomId == '/' || roomId == '/null' || roomId == null || roomId == ''){
@@ -44,7 +52,7 @@
 
       socket.on("connect", () => {
         socket.emit('createConnection',pseudo,new URL(window.location.href).pathname.split('/')[1]);
-        console.log('Envoi du pseudo ' + pseudo + ' au serveur');
+        console.log('Connexion au serveur');
       });
 
       form.addEventListener('submit', function(e) {
@@ -62,15 +70,40 @@
         window.scrollTo(0, document.body.scrollHeight);
       });
 
-      socket.on('createConnection', function(msg){
+      //premier échange avec le nouveau socket
+      socket.on('me connected', function(pseudo, roomUsers){
+        users = roomUsers;
+        document.getElementById('name').innerHTML = pseudo;
+      })
+
+      //un nouvel utilisateur vient de se connecter
+      socket.on('user connected', function(pseudo){
+        users.push(pseudo);
         let item = document.createElement('li');
         let i = document.createElement('i');
-        i.textContent = msg
+        i.textContent = `${pseudo} vient d'arrivé`;
         item.appendChild(i)
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
-        console.log(msg);
+        userListUpd(users);
+        console.log(pseudo + ' vient d\'arriver');
       })
+
+      socket.on('user deconnected', function(pseudo){
+        let i = users.indexOf(pseudo);
+        users.splice(i,1);
+        console.log(pseudo + ' est partit');
+        userListUpd(users);
+      })
+
+      function userListUpd(roomUsers){
+        userList.innerHTML = '';
+        roomUsers.forEach(user => {
+          let item = document.createElement('li');
+          item.innerHTML = user;
+          userList.appendChild(item);
+        })
+      }
     </script>
   </body>
 </html>

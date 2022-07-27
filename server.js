@@ -14,23 +14,38 @@ app.get('*', (req, res) => {
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
-    console.log(users.get(socket) + ' s\'est déconnecté');
+    io.to(Array.from(socket.rooms)).emit('user deconnected', users.get(socket).nickname);
     socket.leave(Array.from(socket.rooms));
+    console.log(users.get(socket).nickname + ' s\'est déconnecté');
     users.delete(socket);
   });
 
   socket.on('chat message', (msg) => {
-    let pseudo = users.get(socket);
+    let pseudo = users.get(socket).nickname;
 
     console.log(Array.from(socket.rooms)[1] + '> ' + pseudo + ': ' + msg);
     io.to(Array.from(socket.rooms)).emit('chat message', pseudo + ': ' + msg);
   });
   
   socket.on('createConnection', function(pseudo, roomId){
-    users.set(socket, pseudo);
     socket.join(roomId);
-    io.to(Array.from(socket.rooms)).emit('createConnection', pseudo + ' vient d\'arrivé dans la salle ' + roomId);
-    console.log(users.get(socket) + ' vient de se connecter à la salle ' + roomId);
+
+    let roomUsers = [];
+    users.forEach((value, key, set) => {
+      if(value.room == roomId)
+        roomUsers.push(value.nickname);
+    })
+    //console.log(roomUsers);
+
+    socket.emit('me connected'
+      , pseudo
+      , roomUsers);
+      
+    users.set(socket, {nickname: pseudo, room: roomId});
+
+    io.to(Array.from(socket.rooms)).emit('user connected'
+      , pseudo);
+    console.log(users.get(socket).nickname + ' vient de se connecter à la salle ' + roomId);
   })
 });
 
