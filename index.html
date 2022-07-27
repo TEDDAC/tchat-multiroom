@@ -26,10 +26,19 @@
       let messages = document.getElementById('messages');
       let form = document.getElementById('form');
       let input = document.getElementById('input');
+      
+      let roomId = window.location.pathname
+      while(roomId == '/' || roomId == '/null' || roomId == null || roomId == ''){
+        roomId = prompt('Entrez un nom de salon');
+      }
+      if(window.location.pathname != roomId)
+        window.location.href = `${roomId}`
+
       let pseudo = null;
       while(pseudo == null){
         pseudo = prompt("Choisissez un pseudo");
       }
+
       
       let socket = io();
 
