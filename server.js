@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
     let pseudo = users.get(socket).nickname;
 
     console.log(Array.from(socket.rooms)[1] + '> ' + pseudo + ': ' + msg);
-    io.to(Array.from(socket.rooms)).emit('chat message', pseudo + ': ' + msg);
+    io.to(Array.from(socket.rooms)).emit('chat message', pseudo, msg);
   });
   
   socket.on('createConnection', function(pseudo, roomId){
@@ -46,6 +46,18 @@ io.on('connection', (socket) => {
     io.to(Array.from(socket.rooms)).emit('user connected'
       , pseudo);
     console.log(users.get(socket).nickname + ' vient de se connecter à la salle ' + roomId);
+  })
+
+  socket.on('writing', function(){
+    let pseudo = users.get(socket).nickname;
+
+    io.to(Array.from(socket.rooms)).emit('is writing', pseudo);
+  })
+
+  socket.on('not writing', function(){
+    let pseudo = users.get(socket).nickname;
+
+    io.to(Array.from(socket.rooms)).emit('is not writing', pseudo);
   })
 });
 
