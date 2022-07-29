@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <head>
+  <head> 
+    <meta charset="UTF-8">
     <title>Socket.IO chat</title>
     <style>
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -17,12 +18,10 @@
     </style>
   </head>
   <body>
-    <div style="display: flex; flex-direction: row;">
-      <ul id="messages" style="width: 80%;"></ul>
-      <div style="width: 20%;">
-        <p id="name" style="float: right; border: black 1px solid; padding: 10px;"></p>
-        <ul id="users"></ul>
-      </div>
+    <ul id="messages" style="width: 80%;"></ul>
+    <div style="width: 20%; position: fixed; right: 0; top: 0; bottom: 0;">
+      <p id="name" style="float: right; border: black 1px solid; padding: 10px;"></p>
+      <ul id="users"></ul>
     </div>
     <div id="footer">
       <span id="writingMessage" style="padding-left: 5px; padding-bottom: 3px;"></span>
@@ -49,8 +48,9 @@
         window.location.href = `${roomId}`
 
       let pseudo = null;
-      while(pseudo == null){
+      while(isEmptyOrSpaces(pseudo) || pseudo.length > 20){
         pseudo = prompt("Choisissez un pseudo");
+        pseudo = encodeURI(pseudo).replaceAll('%20', ' ');
       }
 
       document.title = `${roomId.split('/')[1]} - ${pseudo}`;
@@ -65,7 +65,7 @@
 
       form.addEventListener('submit', function(e) {
         e.preventDefault();
-        if (input.value) {
+        if (input.value && input.value != '' && input.value.length < 500) {
           socket.emit('chat message', input.value);
           input.value = '';
           usersWriting.splice(usersWriting.indexOf(pseudo),1);
@@ -79,10 +79,10 @@
       input.onblur = function(){
         socket.emit('not writing');
       }
-      socket.on('is writing', (pseudo) => {
+      /*socket.on('is writing', (pseudo) => {
         usersWriting.push(pseudo);
         refreshWritingMessage();
-      })
+      })*/
       socket.on('is not writing', (pseudo) => {
         usersWriting.splice(usersWriting.indexOf(pseudo),1);
         refreshWritingMessage();
@@ -138,6 +138,10 @@
         else if(usersWriting > 1) 
           writingMessage.innerHTML = `${usersWriting} sont en train d'écrire`;
         else writingMessage.innerHTML = '';
+      }
+
+      function isEmptyOrSpaces(str){
+        return str === null || str.match(/^ *$/) !== null;
       }
     </script>
   </body>
