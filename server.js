@@ -14,9 +14,9 @@ app.get('*', (req, res) => {
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
+    console.log(users.get(socket).nickname + ' s\'est déconnecté ' + users.get(socket).room);
     io.to(Array.from(socket.rooms)).emit('user deconnected', users.get(socket).nickname);
     socket.leave(Array.from(socket.rooms));
-    console.log(users.get(socket).nickname + ' s\'est déconnecté');
     users.delete(socket);
   });
 
