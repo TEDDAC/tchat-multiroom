@@ -88,9 +88,9 @@
         refreshWritingMessage();
       })
 
-      socket.on('chat message', function(pseudo, msg) {
+      socket.on('chat message', function(pseudo, msg, time) {
         let item = document.createElement('li');
-        item.textContent = `${pseudo}: ${msg}`;
+        item.textContent = `${time} ${pseudo}: ${msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
         usersWriting.splice(usersWriting.indexOf(pseudo),1);

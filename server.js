@@ -14,7 +14,7 @@ app.get('*', (req, res) => {
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
-    console.log(users.get(socket).nickname + ' s\'est déconnecté ' + users.get(socket).room);
+    console.log(users.get(socket).nickname + ' s\'est déconnecté de ' + users.get(socket).room);
     io.to(Array.from(socket.rooms)).emit('user deconnected', users.get(socket).nickname);
     socket.leave(Array.from(socket.rooms));
     users.delete(socket);
@@ -23,8 +23,10 @@ io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     let pseudo = users.get(socket).nickname;
 
-    console.log(Array.from(socket.rooms)[1] + '> ' + pseudo + ': ' + msg);
-    io.to(Array.from(socket.rooms)).emit('chat message', pseudo, msg);
+    let date = new Date(Date.now());
+    let time = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+    console.log(`${Array.from(socket.rooms)[1]} > ${time} ${pseudo}: ${msg}`);
+    io.to(Array.from(socket.rooms)).emit('chat message', pseudo, msg, time);
   });
   
   socket.on('createConnection', function(pseudo, roomId){
