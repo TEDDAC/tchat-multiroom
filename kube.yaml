@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-multiroom
+  namespace: chat-multiroom
+  labels:
+    app: chat-multiroom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-multiroom
+  template:
+    metadata:
+      name: chat-multiroom
+      labels:
+        app: chat-multiroom
+    spec:
+      containers:
+      - image: ghcr.io/teddac/tchat-multiroom:latest
+        name: chat-multiroom
+        ports:
+        - containerPort: 3000
+          name: chat-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-multiroom
+  namespace: chat-multiroom
+  labels:
+    app: chat-multiroom
+spec:
+  type: ClusterIP
+  selector:
+    app: chat-multiroom
+  ports:
+  - name: chat-port
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: chat-multiroom
+  namespace: chat-multiroom
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`chat.altaif4.fr`)
+    kind: Rule
+    services:
+    - name: chat-multiroom
+      port: 3000
+  tls:
+    certResolver: myresolver
