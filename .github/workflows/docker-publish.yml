@@ -22,8 +22,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/TEDDAC/tchat-multiroom:latest .
+          docker build -t ghcr.io/teddac/tchat-multiroom:latest .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/TEDDAC/tchat-multiroom:latest
+          docker push ghcr.io/teddac/tchat-multiroom:latest
